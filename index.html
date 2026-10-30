@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore Menu Digitale per Eventi | Digital Creator Lab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+            header, .no-print {
+                display: none !important;
+            }
+            .print-area {
+                border: none !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+            }
+            .print-text-dark {
+                color: #000000 !important;
+            }
+            .print-border {
+                border-color: #cccccc !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12 flex flex-col justify-between selection:bg-amber-500 selection:text-white">
+
+    <!-- Header Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-amber-500/20">
+                    📋
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-white leading-tight">EventMenu Creator</h1>
+                    <p class="text-xs text-amber-400 font-medium">Digital Creator Lab — Banqueting & Ristorazione</p>
+                </div>
+            </div>
+            
+            <button id="guideBtn" type="button" onclick="toggleGuide(event)" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-all border border-slate-700 cursor-pointer">
+                <span>❓ Guida Utente</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 pt-6 flex-grow w-full space-y-6">
+
+        <!-- Banner Guida Utente -->
+        <section id="userGuide" class="hidden glass-card rounded-2xl p-5 border-amber-500/40 transition-all shadow-2xl no-print">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center gap-2 font-bold text-white">
+                    <span>🧭</span>
+                    <h2 class="text-base">Guida Utente: Come creare e condividere il Menu</h2>
+                </div>
+                <button type="button" onclick="hideGuide()" class="text-slate-400 hover:text-white text-sm px-2 py-1 rounded-lg bg-slate-800 transition-all">
+                    ✖
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300">
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <div class="font-semibold text-amber-400 mb-1">1. Dettagli Evento</div>
+                    <p>Imposta il nome del tuo locale, ristorante o brand e il titolo dell'evento.</p>
+                </div>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <div class="font-semibold text-amber-400 mb-1">2. Inserisci i Piatti o Drink</div>
+                    <p>Scegli la categoria che preferisci (Antipasti, Primi, Pizza, Drink, ecc.) e compila i campi.</p>
+                </div>
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <div class="font-semibold text-amber-400 mb-1">3. Stampa o Condividi</div>
+                    <p>Usa i pulsanti per stampare il menu in PDF o inviarlo subito via WhatsApp!</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- COLONNA SINISTRA: Form Configurazione Voci -->
+            <div class="lg:col-span-7 space-y-6 no-print">
+                
+                <!-- Dettagli Evento -->
+                <section class="glass-card rounded-2xl p-5 shadow-xl space-y-4">
+                    <h2 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <span>⚙️</span> Info Evento & Locale
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Nome Locale / Ristorante</label>
+                            <input type="text" id="brandName" value="Digital Creator Lab" oninput="updateMenuPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Titolo Evento / Serata</label>
+                            <input type="text" id="eventTitle" value="Cena Degustazione & Banqueting" oninput="updateMenuPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Form Aggiunta Voce Menu -->
+                <section class="glass-card rounded-2xl p-5 shadow-xl space-y-4">
+                    <h2 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <span>➕</span> Aggiungi Piatto o Drink
+                    </h2>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-400 mb-1 font-medium">Categoria</label>
+                                <select id="itemCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                                    <option value="🥗 Antipasti & Finger Food">🥗 Antipasti & Finger Food</option>
+                                    <option value="🍝 Primi Piatti">🍝 Primi Piatti</option>
+                                    <option value="🥩 Secondi & Carni">🥩 Secondi & Carni</option>
+                                    <option value="🐟 Piatti di Mare">🐟 Piatti di Mare</option>
+                                    <option value="🍕 Pizze & Lievitati">🍕 Pizze & Lievitati</option>
+                                    <option value="🍔 Burger & Street Food">🍔 Burger & Street Food</option>
+                                    <option value="🍹 Cocktails & Drink">🍹 Cocktails & Drink</option>
+                                    <option value="🍷 Vini & Bollicine">🍷 Vini & Bollicine</option>
+                                    <option value="🍰 Dessert & Dolci">🍰 Dessert & Dolci</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1 font-medium">Nome Piatto / Drink</label>
+                                <input type="text" id="itemName" placeholder="Es. Paccheri allo Scoglio 1862" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="sm:col-span-2">
+                                <label class="block text-slate-400 mb-1 font-medium">Ingredienti / Descrizione</label>
+                                <input type="text" id="itemDesc" placeholder="Es. Pomodorini del piennolo, cozze, gamberi, prezzemolo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1 font-medium">Prezzo (€)</label>
+                                <input type="text" id="itemPrice" placeholder="Es. 14.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Etichetta / Badge (Opzionale)</label>
+                            <select id="itemTag" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                                <option value="">Nessun Badge</option>
+                                <option value="⭐ Specialità / Signature">⭐ Specialità / Signature</option>
+                                <option value="🔥 Consigliato dallo Chef">🔥 Consigliato dallo Chef</option>
+                                <option value="🆕 Novità">🆕 Novità</option>
+                                <option value="🍃 Vegetariano / Veg">🍃 Vegetariano / Veg</option>
+                                <option value="🌾 Senza Glutine (GF)">🌾 Senza Glutine (GF)</option>
+                                <option value="🌶️ Piccante">🌶️ Piccante</option>
+                            </select>
+                        </div>
+
+                        <button type="button" onclick="addMenuItem()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-all shadow-md">
+                            ➕ Aggiungi al Menu
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Lista Voci Inserite -->
+                <section class="glass-card rounded-2xl p-5 shadow-xl space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h2 class="text-sm font-bold text-white">Voci nel Menu (<span id="itemCount">0</span>)</h2>
+                        <button type="button" onclick="clearAllItems()" class="text-xs text-rose-400 hover:text-rose-300 transition-all">Svuota tutto</button>
+                    </div>
+                    <div id="itemsList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        <!-- Generato via JS -->
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- COLONNA DESTRA: Anteprima Live & Azioni -->
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- ANTEPRIMA SCHERMO & STAMPA -->
+                <section class="glass-card rounded-2xl p-5 shadow-xl space-y-4 print-area">
+                    <div class="flex items-center justify-between no-print">
+                        <h2 class="text-sm font-bold text-amber-400">📱 Anteprima Menu</h2>
+                        <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Scheda Pronta</span>
+                    </div>
+
+                    <!-- Scheda del Menu -->
+                    <div class="bg-slate-950 rounded-2xl p-5 border border-slate-800 space-y-4 shadow-inner min-h-[350px] print-area">
+                        <div class="text-center border-b border-slate-800 pb-3 print-border">
+                            <span id="prevBrand" class="text-xs uppercase tracking-widest text-amber-400 font-bold block print-text-dark">Digital Creator Lab</span>
+                            <h3 id="prevTitle" class="text-base font-extrabold text-white print-text-dark">Cena Degustazione & Banqueting</h3>
+                        </div>
+
+                        <div id="prevContent" class="space-y-4">
+                            <!-- Voci raggruppate per categoria via JS -->
+                        </div>
+                    </div>
+
+                    <!-- PULSANTI AZIONE: STAMPA E CONDIVIDI -->
+                    <div class="space-y-2 pt-2 no-print">
+                        <button type="button" onclick="printMenu()" class="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                            <span>🖨️ Stampa o Salva in PDF</span>
+                        </button>
+
+                        <button type="button" onclick="shareWhatsApp()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs">
+                            <span>💬 Condividi su WhatsApp</span>
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 border-t border-slate-800 pt-6 text-center text-xs text-slate-500 bg-slate-950 no-print">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 pb-4">
+            <p>© 2026 <span class="text-slate-300 font-semibold">Digital Creator Lab</span>. Strumenti per Eventi & Ristorazione.</p>
+            <span class="text-amber-400 font-medium">Banqueting Edition 📋</span>
+        </div>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        var menuItems = [];
+
+        function toggleGuide(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            var guide = document.getElementById('userGuide');
+            if (guide) guide.classList.toggle('hidden');
+        }
+
+        function hideGuide() {
+            var guide = document.getElementById('userGuide');
+            if (guide) guide.classList.add('hidden');
+        }
+
+        function addMenuItem() {
+            var cat = document.getElementById('itemCategory').value;
+            var name = document.getElementById('itemName').value.trim();
+            var desc = document.getElementById('itemDesc').value.trim();
+            var price = document.getElementById('itemPrice').value.trim();
+            var tag = document.getElementById('itemTag').value;
+
+            if (!name) {
+                alert('Inserisci almeno il nome del piatto o della bevanda!');
+                return;
+            }
+
+            menuItems.push({
+                id: Date.now(),
+                category: cat,
+                name: name,
+                desc: desc,
+                price: price,
+                tag: tag
+            });
+
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemDesc').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemTag').value = '';
+
+            renderItemsList();
+            updateMenuPreview();
+        }
+
+        function removeItem(id) {
+            menuItems = menuItems.filter(function(item) { return item.id !== id; });
+            renderItemsList();
+            updateMenuPreview();
+        }
+
+        function clearAllItems() {
+            if (confirm('Vuoi davvero cancellare tutte le voci inserite?')) {
+                menuItems = [];
+                renderItemsList();
+                updateMenuPreview();
+            }
+        }
+
+        function renderItemsList() {
+            var container = document.getElementById('itemsList');
+            document.getElementById('itemCount').innerText = menuItems.length;
+
+            if (menuItems.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500 italic text-center py-4">Nessuna voce ancora inserita.</p>';
+                return;
+            }
+
+            var html = '';
+            menuItems.forEach(function(item) {
+                html += '<div class="flex items-center justify-between p-2.5 bg-slate-900/90 rounded-xl border border-slate-800 text-xs">' +
+                            '<div>' +
+                                '<div class="font-bold text-white">' + item.name + ' <span class="text-[10px] text-amber-400 font-normal">(' + item.category + ')</span></div>' +
+                                (item.desc ? '<div class="text-[11px] text-slate-400">' + item.desc + '</div>' : '') +
+                            '</div>' +
+                            '<div class="flex items-center gap-2">' +
+                                (item.price ? '<span class="font-mono text-amber-300 font-semibold">€' + item.price + '</span>' : '') +
+                                '<button onclick="removeItem(' + item.id + ')" class="text-slate-500 hover:text-rose-400 font-bold px-1.5 py-0.5 rounded">✖</button>' +
+                            '</div>' +
+                        '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function updateMenuPreview() {
+            var brand = document.getElementById('brandName').value || 'Digital Creator Lab';
+            var title = document.getElementById('eventTitle').value || 'Menu Evento';
+
+            document.getElementById('prevBrand').innerText = brand;
+            document.getElementById('prevTitle').innerText = title;
+
+            var prevContent = document.getElementById('prevContent');
+
+            if (menuItems.length === 0) {
+                prevContent.innerHTML = '<p class="text-xs text-slate-600 text-center py-8">Aggiungi voci dal modulo per vederle qui in anteprima.</p>';
+            } else {
+                var categories = {};
+                menuItems.forEach(function(item) {
+                    if (!categories[item.category]) categories[item.category] = [];
+                    categories[item.category].push(item);
+                });
+
+                var html = '';
+                for (var cat in categories) {
+                    html += '<div class="space-y-2">' +
+                                '<h4 class="text-xs font-bold text-amber-400 border-b border-slate-800 pb-1 print-text-dark print-border">' + cat + '</h4>' +
+                                '<div class="space-y-2">';
+                    categories[cat].forEach(function(item) {
+                        html += '<div class="flex justify-between items-start text-xs">' +
+                                    '<div class="space-y-0.5">' +
+                                        '<div class="font-semibold text-slate-200 print-text-dark">' + item.name + ' ' + (item.tag ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded print-text-dark">' + item.tag + '</span>' : '') + '</div>' +
+                                        (item.desc ? '<div class="text-[10px] text-slate-400 print-text-dark leading-tight">' + item.desc + '</div>' : '') +
+                                    '</div>' +
+                                    (item.price ? '<div class="font-mono text-xs font-bold text-amber-400 print-text-dark pl-2">€' + item.price + '</div>' : '') +
+                                '</div>';
+                    });
+                    html += '</div></div>';
+                }
+                prevContent.innerHTML = html;
+            }
+        }
+
+        function printMenu() {
+            window.print();
+        }
+
+        function shareWhatsApp() {
+            var brand = document.getElementById('brandName').value || 'Digital Creator Lab';
+            var title = document.getElementById('eventTitle').value || 'Menu Evento';
+
+            if (menuItems.length === 0) {
+                alert('Aggiungi almeno una voce al menu prima di condividerlo!');
+                return;
+            }
+
+            var text = "📋 *" + brand.toUpperCase() + "*\n";
+            text += "✨ *" + title + "*\n\n";
+
+            var categories = {};
+            menuItems.forEach(function(item) {
+                if (!categories[item.category]) categories[item.category] = [];
+                categories[item.category].push(item);
+            });
+
+            for (var cat in categories) {
+                text += "*" + cat + "*\n";
+                categories[cat].forEach(function(item) {
+                    text += "• " + item.name;
+                    if (item.price) text += " (€" + item.price + ")";
+                    if (item.desc) text += " - _" + item.desc + "_";
+                    text += "\n";
+                });
+                text += "\n";
+            }
+
+            var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+            window.open(whatsappUrl, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            menuItems = [
+                { id: 1, category: '🥗 Antipasti & Finger Food', name: 'Tartare di Salmone & Avocado', desc: 'Con emulsione al lime e cialda croccante', price: '14.00', tag: '⭐ Specialità / Signature' },
+                { id: 2, category: '🍝 Primi Piatti', name: 'Paccheri allo Scoglio 1862', desc: 'Pomodorini, cozze, vongole e gamberi freschi', price: '16.00', tag: '🔥 Consigliato dallo Chef' },
+                { id: 3, category: '🍰 Dessert & Dolci', name: 'Tiramisù Scomposto', desc: 'Crema al mascarpone, savoiardi inzuppati e cacao amaro', price: '7.00', tag: '' }
+            ];
+            renderItemsList();
+            updateMenuPreview();
+
+            document.addEventListener('click', function(e) {
+                var guide = document.getElementById('userGuide');
+                var btn = document.getElementById('guideBtn');
+                if (guide && !guide.classList.contains('hidden') && !guide.contains(e.target) && !btn.contains(e.target)) {
+                    guide.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
